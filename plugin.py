@@ -45,6 +45,7 @@ class BasePlugin:
     wind=3
     extraSensor=4
     nrExtraSensors=7
+    rain=11
    
     def __init__(self):
         return
@@ -67,6 +68,7 @@ class BasePlugin:
         for nr in range(1,self.nrExtraSensors+1):
           unit=nr+self.extraSensor-1
           if unit not in Devices: Domoticz.Device(Name="extra"+str(nr),Unit=unit, TypeName="Temp+Hum", Used=1).Create()       
+        if self.rain not in Devices: Domoticz.Device(Name="rain",Unit=self.rain, TypeName="Rain", Used=1).Create() 
 
         try:
             temp = Devices[1].TimedOut
@@ -116,7 +118,7 @@ class BasePlugin:
               csv_dict_reader = DictReader(read_obj)
               row=next(csv_dict_reader)
 #temp, hum, hum_staus, pressure, forecast              
-              val=str(row['outTemp'])+';'+str(row['outHumidity'])+';0;'+str(row['pressure'])+';0'
+              val=str(row['outTemp'])+';'+str(row['outHumidity'])+';0;'+str(row['barometer'])+';0'
               Devices[self.outdoor].Update(0,val)
               val=str(row['inTemp'])+';'+str(row['inHumidity'])+';0'
               Devices[self.indoor].Update(0,val)
@@ -128,6 +130,8 @@ class BasePlugin:
                 unit=nr+self.extraSensor-1
                 val=str(row['extraTemp'+str(nr)])+';'+str(row['extraHumid'+str(nr)])+';0'
                 Devices[unit].Update(0,val)
+#svalue=RAINRATE;RAINCOUNTER                
+              Devices[self.rain].Update(0, ";".join([field(row,'hourRain',1000),"0"]))
               
 # parse result                
         elif (Status == 400):
@@ -205,6 +209,9 @@ def DumpConfigToLog():
         Domoticz.Debug("Device LastLevel: " + str(Devices[x].LastLevel))
     return
 
+def field(row,name,mult=1):
+  return str(round(mult*float(row[name])))
+  
 #def DumpHTTPResponseToLog(httpDict):
 #    if isinstance(httpDict, dict):
 #        Domoticz.Debug("HTTP Details ("+str(len(httpDict))+"):")
