@@ -117,6 +117,10 @@ class BasePlugin:
             with io.StringIO(strData) as read_obj: 
               csv_dict_reader = DictReader(read_obj)
               row=next(csv_dict_reader)
+              if (int(Parameters["Mode6"]) & 2):
+                for var in row:
+                  Domoticz.Debug("csv "+str(var)+" = "+str(row[var]))
+
 #temp, hum, hum_staus, pressure, forecast              
               val=str(row['outTemp'])+';'+str(row['outHumidity'])+';0;'+str(row['barometer'])+';0'
               Devices[self.outdoor].Update(0,val)
@@ -124,7 +128,7 @@ class BasePlugin:
               Devices[self.indoor].Update(0,val)
 #WB;WD;WS;WG;temp;chill
               if row['windDir']=="None": wd="N"
-              else: wd=["N","NE","E","SE","S","SW","W","NW"][(int(field(row,'windDir'))*2+45)/90%8]
+              else: wd=["N","NE","E","SE","S","SW","W","NW"][int((int(field(row,'windDir'))*2+45)/90)%8]
               arr=[field(row,'windDir'),wd,field(row,'windSpeed',10),field(row,'windGust',10),field(row,'outTemp'),field(row,'windchill')]
               val=";".join(arr)
               if (int(Parameters["Mode6"]) & 2):
