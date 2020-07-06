@@ -129,11 +129,10 @@ class BasePlugin:
 #WB;WD;WS;WG;temp;chill
               if row['windDir']=="None": wd="N"
               else: wd=["N","NE","E","SE","S","SW","W","NW"][int((int(field(row,'windDir'))*2+45)/90)%8]
-              arr=[field(row,'windDir'),wd,field(row,'windSpeed',10),field(row,'windGust',10),field(row,'outTemp'),field(row,'windchill')]
+              arr=[field(row,'windDir'),wd,field(row,'windSpeed',10),field(row,'windGust',10),field(row,'outTemp'),field(row,'heatindex')]
               val=";".join(arr)
               if (int(Parameters["Mode6"]) & 2):
                 Domoticz.Log("wind val = "+str(val))
-#              val=str(row['windDir'])+';;'+str(10*row['windSpeed'])+';'+str(10*row['windGust'])+';'+str(row['outTemp'])+';'+str(row['windchill'])
               Devices[self.wind].Update(0,str(val))
 
               for nr in range(1,self.nrExtraSensors+1):
